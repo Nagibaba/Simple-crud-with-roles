@@ -6,38 +6,30 @@
     <div class="row">
         <ul class="list-group">
         @include('errors.errors')
-        @if(!isset($user)&&Auth::check()&&Auth::user()->canEffectPosts())
-        <center>
-          <a href="{{url('posts/create')}}" class="btn btn-success ">Create Post + </a>
-        </center>
-        @endif
-        @if(isset($user))
-        <center>
-          <h2>{{$user->name}}</h2>
-          Email: {{$user->email}}<br>
-          Role: {{$user->role}}
-          
-        </center>
-        @endif
-        <br>
         
-            @foreach($posts as $post)
+        <center>
+          <a href="{{url('users/create')}}" class="btn btn-success ">Create User + </a>
+        </center>
+      
+        <br>
+            
+            @foreach($users as $user)
             <li class="list-group-item">
-                <span><img src="{{isset($post->thumb)?url('thumbs/'.$post->thumb):'http://lorempixel.com/40/30/'}}" width="40px" height="30px"></span> 
-                <a href="{{url('posts')}}/{{$post->id}}">{{$post->title}}</a>
+                
+                <a href="{{url('users')}}/{{$user->id}}">{{$user->name}}</a>
                 
                 <span class="pull-right">
-                <a id="look" class="btn btn-md btn-info" href="{{url('posts')}}/{{$post->id}}"><i class="fa fa-eye" aria-hidden="true"></i></a>  
-                @if(Auth::check()&&Auth::user()->canEffectPosts())
-                <a id="edit" class="btn btn-md btn-success" href="{{url('posts')}}/{{$post->id}}/edit" post-id="{{$post->id}}"><i class="fa fa-pencil-square-o" aria-hidden="true" ></i></a> 
-                <a class="btn btn-md btn-danger" href="{{url('posts')}}/{{$post->id}}" data-method="delete" 
+                <a id="look" class="btn btn-md btn-info" href="{{url('users')}}/{{$user->id}}"><i class="fa fa-eye" aria-hidden="true"></i></a>  
+              
+                <a id="edit" class="btn btn-md btn-success" href="{{url('users')}}/{{$user->id}}/edit" user-id="{{$user->id}}"><i class="fa fa-pencil-square-o" aria-hidden="true" onclick="event.preventDefault()" ></i></a> 
+                <a class="btn btn-md btn-danger" href="{{url('users')}}/{{$user->id}}" data-method="delete" 
                 data-token="{{csrf_token()}}" data-confirm="Are you sure?"><i class="fa fa-times" aria-hidden="true"></i></a>  
-                @endif
+          
                 </span>
             </li>
             @endforeach
         </ul>
-        {{$posts->links()}}
+        {{$users->links()}}
         <!-- Modal -->
         <div class="modal fade" id="myModal" role="dialog">
           <div class="modal-dialog">
@@ -52,19 +44,35 @@
                 <form id="editForm" action="" method="POST" enctype="multipart/form-data">
                     {{ method_field('PUT') }}
                     {{csrf_field()}}
-                    <input type="hidden" name="postId" id="postId" >
+                    <input type="hidden" name="userId" id="userId">
                     <div class=" md-form">
-                        <label class="control-label">Title <span class="mecburi">*</span></label>
-                        <input type="text" class="" name="title" id="title" required >
-                        
+                        <label class="control-label">Name <span class="mecburi">*</span></label>
+                        <input type="text" class="" name="name" id="name" value="{{old('name')}}" required >
                     </div>
-                    <div class="md-form" >
-                        <label class="control-label">Content <span class="mecburi">*</span></label>
-                        <textarea class="md-textarea" id="content" name="content" rows="10"></textarea>
-                        <span class="material-input"></span>
+                    <div class=" md-form">
+                        <label class="control-label">Email <span class="mecburi">*</span></label>
+                        <input type="text" class="" name="email" id="email" value="{{old('email')}}" required >
                     </div>
-                 
-                    <input type="file" name="img" id="img" class="form-control">
+                    <small >if you don't want to change password, then just ignore it</small>
+                     <div class=" md-form">
+                        <label class="control-label">New password <span class="mecburi">*</span></label>
+                        <input type="password" class="" name="password" id="password" >
+                    </div>
+                    <div class=" md-form">
+                        <label class="control-label">New password again<span class="mecburi">*</span></label>
+                        <input type="password" class="" name="password_confirmation" id="password_confirmation" >
+                    </div>
+                    
+                    <div class=" md-select">
+                        <label class="control-label">Role <span class="mecburi">*</span></label>
+                        <select class="form-control" name="role" id="role" required>
+                            <option value=""></option>
+                            <option value="user">User</option>
+                            <option value="editor">Editor</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                   
                     <input type="submit" name="submit" class="btn btn-info">
                 </form>
               </div>
@@ -164,15 +172,14 @@
           $('#edit').click(function(e){
               e.preventDefault();
               $('#myModal').modal();
-              var id = $(this).attr('post-id');
-              console.log(id);
-              $.get('posts/'+id,function(data){
-                  $('#title').val(data.title);
-                  $('#content').val(data.content);
+              var id = $(this).attr('user-id');
+              $.get('users/'+id,function(data){
+                  $('#name').val(data.name);
+                  $('#email').val(data.email);
+                  $('#role').val(data.role);
                   $('.control-label').addClass('active');
-                  $('#postId').val(id);
-                  $('#editForm').prop('action','{{url("posts")}}/'+id)
-
+                  $('#userId').val(id);
+                  $('#editForm').prop('action','{{url("users")}}/'+id);
               });
           });
           // $('#editForm').on('submit',function(e){

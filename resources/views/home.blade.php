@@ -8,7 +8,9 @@
                 <div class="panel-heading">Home</div>
                 <center>{{isset($message)?$message:null}}</center>
                 <div class="panel-body">
-                    Hello! 
+                    Laravel 5.4 CRUD operation with 3 roles repository.
+                    Created by  < Babak Nagiyev /><br>
+                    <a href="https://github.com/Nagibaba/Simple-crud-with-roles" target="_blank">Github page</a>
                 </div>
             </div>
         </div>

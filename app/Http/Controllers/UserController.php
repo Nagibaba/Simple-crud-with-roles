@@ -12,74 +12,71 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    function __construct(){
+        $this->middleware('CanEffectUsers');
+    }
     public function index()
     {
-        $users = User::paginate(30);
+        $users = User::latest()->paginate(30);
+        return view('users.index', compact('users'));
     }
+    public function store(Request $r)
+    {
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+        $data = User::validate($r);
+        if(!$data['response']) return redirect('users/create')
+                               ->withErrors($data['validator'])
+                               ->withInput();
+        $user = User::create([
+                'name' => $r->name,
+                'email' => $r->email,
+                'role' => $r->role,
+                'password' => $r->password
+                
+            ]);
+        return redirect('users/'.$user->id);
+    }
     public function create()
     {
-        //
+        return view('users.create');
     }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
-        //
+        $user = User::findOrFail($id);
+        $posts = $user->posts()->select(['id','thumb','title','user_id'])->latest()->paginate(30);
+        
+        if(\Request::ajax()) return $user;
+        return view('posts.index',compact('user','posts'));
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function update(Request $r)
     {
-        //
+        // return $r->file('img');
+        $data = User::validate($r,false);
+        if(!$data['response']) return redirect('users')
+                               ->withErrors($data['validator'])
+                               ->withInput();
+        $array1 =[
+            'name'=>$r->name,
+            'email'=>$r->email,
+            'role'=>$r->role,
+        ];
+        $array2 = [
+            'password'=>$r->password
+        ];
+        if($r->password) $array1 = array_merge($array1,$array2);
+        $user = User::find($r->userId)->update($array1);
+        return redirect('users/'.$r->userId)->with('message','Changed Succesfully');
+
     }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+    public function destroy(Request $r,$id)
     {
-        //
+        $user = User::findOrFail($id);
+        $user->sil();
+
+        return view('home')->with('message','user deleted');
     }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    public function edit()
     {
-        //
+        return 'edit';
     }
 }

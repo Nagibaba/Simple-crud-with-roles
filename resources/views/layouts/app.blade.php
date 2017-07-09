@@ -21,9 +21,7 @@
         .margin{
             margin:3px;
         }
-        .green{
-            color: green;
-        }
+        
         .capimg {
             float: left;
             padding:10px;
@@ -57,7 +55,9 @@
                     </ul>
                     <ul class="nav navbar-nav navbar-left">
                         <li><a href="{{url('posts')}}">Posts</a></li>
+                        @if(Auth::check()&&Auth::user()->canEffectUsers())
                         <li><a href="{{url('users')}}">Users</a></li>
+                        @endif
                     </ul>
                     <!-- Right Side Of Navbar -->
                     <ul class="nav navbar-nav navbar-right">

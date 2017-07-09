@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Post;
 use Intervention\Image\Facades\Image as Image;
+// use Validator;
 
 
 class PostController extends Controller
 {
     function __construct(){
-        $this->middleware('auth', ['only' => ['store','create','update','destroy','edit']]);
+        $this->middleware('CanEffectPosts', ['except' => ['index','show']]);
     }
     public function index()
     {
@@ -20,7 +21,10 @@ class PostController extends Controller
     public function store(Request $r)
     {
         $user_id = auth()->user()->id;
-        Post::validate($r, 'posts/create'); //validate and redirect to ... if fails
+        $data = Post::validate($r);
+        if(!$data['response']) return redirect('posts/create')
+                               ->withErrors($data['validator'])
+                               ->withInput();
         $imgName = '';
         $thumbName = '';   
            
@@ -49,26 +53,21 @@ class PostController extends Controller
     }
     public function update(Request $r)
     {
+        // return $r->file('img');
         $post = Post::findOrFail($r->postId);
-        if(auth()->user()->id!=$post->user()->first()->id) abort(403);
-    	Post::validate($r,'posts');
+    	$data = Post::validate($r);
+        if(!$data['response']) return redirect('posts')
+                               ->withErrors($data['validator'])
+                               ->withInput();
+        
         $array1 = [
             'title' => $r->title,
             'content' => $r->content,
         ];
         if($r->file('img')):
             $post->unlinkImages();
-            // $images = $this->createImages($r->file('img'));
-
-            $ext = $r->img->getClientOriginalExtension();
-            $imgName =  md5(microtime()).".".$ext;
-            $thumbName =  't_'.md5(microtime()).".".$ext;
-            $img = Image::make($r->img)->fit(400, 300)->save(str_replace('\\', '/', public_path()).'/images/'.$imgName);
-            $thumb = Image::make($r->img)->fit(40, 30)->save(str_replace('\\', '/', public_path()).'/thumbs/'.$thumbName);
-            if(!$img or !$thumb) throw new Exception("Error Processing Request image", 1);
-            // $images = ['imgName'=>$imgName, 'thumbName'=>$thumbName];
-            // // return $images;
-            // extract($images);
+            $images = Post::createImages($r->file('img'));
+            extract($images);
             $array2 = [
                 'img_src' => $imgName,
                 'thumb' => $thumbName
@@ -83,22 +82,12 @@ class PostController extends Controller
     {
 
     	$post = Post::findOrFail($id);
-        if(auth()->user()->id!=$post->user()->first()->id) abort(403);
         $post->sil();
 
         return view('home')->with('message','Post deleted');
     }
     public function edit()
     {
-    	return Post::all();
-    }
-    protected function createImages($image){
-        $ext = $image->getClientOriginalExtension();
-        $imgName =  md5(microtime()).".".$ext;
-        $thumbName =  't_'.md5(microtime()).".".$ext;
-        $img = Image::make($image)->fit(400, 300)->save(str_replace('\\', '/', public_path()).'/images/'.$imgName);
-        $thumb = Image::make($image)->fit(40, 30)->save(str_replace('\\', '/', public_path()).'/thumbs/'.$thumbName);
-        if(!$img or !$thumb) throw new Exception("Error Processing Request image", 1);
-        return ['imgName'=>$imgName, 'thumbName'=>$thumbName];
+    	return 'edit';
     }
 }
