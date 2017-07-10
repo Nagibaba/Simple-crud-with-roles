@@ -27,9 +27,9 @@
                 <a href="{{url('posts')}}/{{$post->id}}">{{$post->title}}</a>
                 
                 <span class="pull-right">
-                <a id="look" class="btn btn-md btn-info" href="{{url('posts')}}/{{$post->id}}"><i class="fa fa-eye" aria-hidden="true"></i></a>  
+                <a do-id="look" class="btn btn-md btn-info" href="{{url('posts')}}/{{$post->id}}"><i class="fa fa-eye" aria-hidden="true"></i></a>  
                 @if(Auth::check()&&Auth::user()->canEffectPosts())
-                <a id="edit" class="btn btn-md btn-success" href="{{url('posts')}}/{{$post->id}}/edit" post-id="{{$post->id}}"><i class="fa fa-pencil-square-o" aria-hidden="true" ></i></a> 
+                <a do-id="edit" class="btn btn-md btn-success" href="{{url('posts')}}/{{$post->id}}/edit" post-id="{{$post->id}}"><i class="fa fa-pencil-square-o" aria-hidden="true" ></i></a> 
                 <a class="btn btn-md btn-danger" href="{{url('posts')}}/{{$post->id}}" data-method="delete" 
                 data-token="{{csrf_token()}}" data-confirm="Are you sure?"><i class="fa fa-times" aria-hidden="true"></i></a>  
                 @endif
@@ -161,7 +161,7 @@
           };
 
           laravel.initialize();
-          $('#edit').click(function(e){
+          $('[do-id=edit]').click(function(e){
               e.preventDefault();
               $('#myModal').modal();
               var id = $(this).attr('post-id');

@@ -19,9 +19,9 @@
                 <a href="{{url('users')}}/{{$user->id}}">{{$user->name}}</a>
                 
                 <span class="pull-right">
-                <a id="look" class="btn btn-md btn-info" href="{{url('users')}}/{{$user->id}}"><i class="fa fa-eye" aria-hidden="true"></i></a>  
+                <a do-id="look" class="btn btn-md btn-info" href="{{url('users')}}/{{$user->id}}"><i class="fa fa-eye" aria-hidden="true"></i></a>  
               
-                <a id="edit" class="btn btn-md btn-success" href="{{url('users')}}/{{$user->id}}/edit" user-id="{{$user->id}}"><i class="fa fa-pencil-square-o" aria-hidden="true" onclick="event.preventDefault()" ></i></a> 
+                <a do-id="edit" class="btn btn-md btn-success" href="{{url('users')}}/{{$user->id}}/edit" user-id="{{$user->id}}"><i class="fa fa-pencil-square-o" aria-hidden="true" onclick="event.preventDefault()" ></i></a> 
                 <a class="btn btn-md btn-danger" href="{{url('users')}}/{{$user->id}}" data-method="delete" 
                 data-token="{{csrf_token()}}" data-confirm="Are you sure?"><i class="fa fa-times" aria-hidden="true"></i></a>  
           
@@ -169,7 +169,7 @@
           };
 
           laravel.initialize();
-          $('#edit').click(function(e){
+          $('[do-id=edit]').click(function(e){
               e.preventDefault();
               $('#myModal').modal();
               var id = $(this).attr('user-id');
